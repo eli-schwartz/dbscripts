@@ -258,7 +258,9 @@ checkRemovedPackage() {
 	local pkgbase=$2
 
 	svn up -q "${TMP}/svn-packages-copy/${pkgbase}"
-	! __isGlobfile "${TMP}/svn-packages-copy/${pkgbase}/repos/${repo}-"+([^-])"/PKGBUILD"
+	if __isGlobfile "${TMP}/svn-packages-copy/${pkgbase}/repos/${repo}-"+([^-])"/PKGBUILD"; then
+		return 1
+	fi
 
 	checkRemovedPackageDB $repo $pkgbase
 }
