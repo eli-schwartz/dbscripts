@@ -41,7 +41,7 @@ __checkRepoRemovedPackage() {
 		__checkRepoRemovedPackage extra 'pkg-simple-a' ${arch}
 	done
 
-	checkPackage extra pkg-simple-b
+	checkPackage extra pkg-simple-b 1-1
 }
 
 @test "cleanup epoch packages" {
@@ -88,7 +88,7 @@ __checkRepoRemovedPackage() {
 		__checkRepoRemovedPackage extra 'pkg-any-a' ${arch}
 	done
 
-	checkPackage extra pkg-any-b
+	checkPackage extra pkg-any-b 1-1
 }
 
 @test "cleanup split packages" {
@@ -115,7 +115,7 @@ __checkRepoRemovedPackage() {
 	done
 
 	checkRemovedPackage extra ${pkgs[0]}
-	checkPackage extra ${pkgs[1]}
+	checkPackage extra ${pkgs[1]} 1-1
 }
 
 @test "cleanup old packages" {
