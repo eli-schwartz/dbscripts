@@ -101,5 +101,6 @@ vcs_remove_package() {
 		arch_svn checkout -q -N "${SVNREPO}" "${WORKDIR}/svn" >/dev/null
 	fi
 
+	arch_svn up -q "${WORKDIR}/svn/${pkgbase}" > /dev/null
 	arch_svn rm --force -q "${vcsrepo}"
 }
