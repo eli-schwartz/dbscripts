@@ -4,21 +4,19 @@
 . "$(dirname "$(readlink -e "$0")")/../db-functions"
 
 clean_pkg() {
-	local pkg
-	local target
+	local pkg=${1}
+	local targetdir=${2:-${CLEANUP_DESTDIR}}
 
 	if [[ $CLEANUP_DRYRUN != true ]]; then
-		for pkg in "$@"; do
-			if [[ -h $pkg ]]; then
-				rm -f "$pkg" "$pkg.sig"
-			else
-				mv_acl "$pkg" "$CLEANUP_DESTDIR/${pkg##*/}"
-				if [[ -e $pkg.sig ]]; then
-					mv_acl "$pkg.sig" "$CLEANUP_DESTDIR/${pkg##*/}.sig"
-				fi
-				touch "${CLEANUP_DESTDIR}/${pkg##*/}"
+		if [[ -h ${pkg} ]]; then
+			rm -f "${pkg}" "${pkg}.sig"
+		else
+			mv_acl "${pkg}" "${targetdir}/${pkg##*/}"
+			if [[ -e ${pkg}.sig ]]; then
+				mv_acl "${pkg}.sig" "${targetdir}/${pkg##*/}.sig"
 			fi
-		done
+			touch "${targetdir}/${pkg##*/}"
+		fi
 	fi
 }
 
