@@ -58,6 +58,7 @@ for repo in "${PKGREPOS[@]}"; do
 			for old_pkg in "${old_pkgs[@]}"; do
 				msg2 '%s' "${old_pkg}"
 				clean_pkg "${FTP_BASE}/${repo}/os/${arch}/${old_pkg}"
+				find "${FTP_BASE}/${PKGPOOL}-reproducible/" -name "*.buildlinks" -exec sed -i "/${old_pkg%${PKGEXTS}}/d" {} +
 			done
 		fi
 	done
@@ -79,20 +80,29 @@ if (( ${#old_pkgs[@]} >= 1 )); then
 	done
 fi
 
+mapfile -td '' old_reproducible_pkgs < <(find "${FTP_BASE}/${PKGPOOL}-reproducible/" -name '*.buildlinks' -empty -printf '%f\0')
+if (( ${#old_reproducible_pkgs[@]} >= 1 )); then
+	msg "Removing old packages from reproducible pool..."
+	for old_pkg in "${old_reproducible_pkgs[@]}"; do
+		msg2 '%s' "${old_pkg}"
+		clean_pkg "${FTP_BASE}/${PKGPOOL}-reproducible/${old_pkg}" "${CLEANUP_DESTDIR}/reproducible"
+	done
+fi
+
 unset old_pkgs
 touch -d "${CLEANUP_KEEP} days ago"  "${WORKDIR}/cleanup_timestamp"
 for f in "${CLEANUP_DESTDIR}"/**/*${PKGEXTS}; do
 	if [[ ${WORKDIR}/cleanup_timestamp -nt $f ]]; then
-		old_pkgs+=("${f##*/}")
+		old_pkgs+=("${f}")
 	fi
 done
 if (( ${#old_pkgs[@]} >= 1 )); then
 	msg "Removing old packages from the cleanup directory..."
 	for old_pkg in "${old_pkgs[@]}"; do
-		msg2 '%s' "${old_pkg}"
+		msg2 '%s' "${old_pkg#${CLEANUP_DESTDIR}/}"
 		if [[ $CLEANUP_DRYRUN != true ]]; then
-			rm -f "${CLEANUP_DESTDIR}/${old_pkg}"
-			rm -f "${CLEANUP_DESTDIR}/${old_pkg}.sig"
+			rm -f "${old_pkg}"
+			rm -f "${old_pkg}.sig"
 		fi
 	done
 fi
