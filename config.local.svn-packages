@@ -2,6 +2,7 @@
 
 PKGREPOS=('core' 'extra' 'testing' 'staging' 'kde-unstable' 'gnome-unstable')
 PKGPOOL='pool/packages'
+EXTRA_PKGPOOLS=('pool/community')
 SRCPOOL='sources/packages'
 SVNREPO='file:///srv/repos/svn-packages/svn'
 SVNUSER='svn-packages'

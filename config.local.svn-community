@@ -2,6 +2,7 @@
 
 PKGREPOS=('community' 'community-testing' 'community-staging' 'multilib' 'multilib-testing' 'multilib-staging')
 PKGPOOL='pool/community'
+EXTRA_PKGPOOLS=('pool/packages')
 SRCPOOL='sources/community'
 SVNREPO='file:///srv/repos/svn-community/svn'
 SVNUSER='svn-community'
