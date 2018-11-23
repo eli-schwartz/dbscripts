@@ -102,6 +102,7 @@ setup() {
 	SVNREPO="file://${TMP}/svn-packages-repo"
 	PKGREPOS=('core' 'extra' 'testing')
 	PKGPOOL='pool/packages'
+	EXTRA_PKGPOOLS=('pool/community')
 	SRCPOOL='sources/packages'
 	TESTING_REPO='testing'
 	STABLE_REPOS=('core' 'extra')
@@ -123,8 +124,17 @@ eot
 			mkdir -p "${TMP}/ftp/${r}/os/${a}"
 		done
 	done
-	mkdir -p "${TMP}/ftp/${PKGPOOL}"
+	mkdir -p "${TMP}/ftp/${PKGPOOL}"{,-reproducible}
+	mkdir -p "${TMP}/ftp/${EXTRA_PKGPOOLS[0]}"
 	mkdir -p "${TMP}/ftp/${SRCPOOL}"
+
+	# make dummy packages for "reproducibility"
+	comm -12 <(pacman -Sql core extra | sort -u) <(pacman -Qq | sort -u) | pacman -Sddp - | while read -r line; do
+		touch "${FTP_BASE}/${PKGPOOL}/${line##*/}"{,.sig}
+	done
+	comm -12 <(pacman -Sql community | sort -u) <(pacman -Qq | sort -u) | pacman -Sddp - | while read -r line; do
+		touch "${FTP_BASE}/${EXTRA_PKGPOOLS[0]}/${line##*/}"{,.sig}
+	done
 
 	svnadmin create "${TMP}/svn-packages-repo"
 	svn checkout -q "file://${TMP}/svn-packages-repo" "${TMP}/svn-packages-copy"
