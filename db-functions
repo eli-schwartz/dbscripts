@@ -382,17 +382,21 @@ check_stagingrepos() {
 	local pkgrepo=${2}
 	local pkgname=$(getpkgname "${pkgfile}")
 	local pkgarch=$(getpkgarch "${pkgfile}")
-	local candidate
+	local candidate candidates=()
 
 	if in_array "${pkgrepo}" "${STABLE_REPOS[@]}"; then
-		candidate=$(find_repo_for_package "${pkgname}" "${pkgarch}" "${TESTING_REPOS[@]}") || return 0
-	elif in_array "${pkgrepo}" "${TESTING_REPOS}"; then
-		candidate=$(find_repo_for_package "${pkgname}" "${pkgarch}" "${STAGING_REPOS[@]}") || return 0
+		candidates+=($(find_repo_for_package "${pkgname}" "${pkgarch}" "${TESTING_REPOS[@]}"))
 	fi
+	if in_array "${pkgrepo}" "${STABLE_REPOS[@]}" "${TESTING_REPOS}"; then
+		candidates+=($(find_repo_for_package "${pkgname}" "${pkgarch}" "${STAGING_REPOS[@]}"))
+	fi
+	(( ${#candidates[@]} == 0 )) && return 0
 
-	printf '%s\n' "${candidate%-*}"
-	for candidate in "${STAGING}/${candidate%-*}"/*${PKGEXTS}; do
-		[[ ${pkgname} = $(getpkgname "${candidate}" 2>/dev/null) ]] && return 0
+	printf '%s\n' "${candidates[@]%-*}"
+	for candidate in "${candidates[@]}"; do
+		for candidate in "${STAGING}/${candidate%-*}"/*${PKGEXTS}; do
+			[[ ${pkgname} = $(getpkgname "${candidate}" 2>/dev/null) ]] && return 0
+		done
 	done
 
 	return 1
