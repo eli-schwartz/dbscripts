@@ -106,6 +106,20 @@ load ../lib/common
 	[ "$status" -ne 0 ]
 }
 
+@test "update any package to stable repo without updating staging package fails" {
+	releasePackage extra pkg-any-a
+	db-update
+	updatePackage pkg-any-a
+	releasePackage staging pkg-any-a
+	db-update
+	updatePackage pkg-any-a
+	releasePackage extra pkg-any-a
+
+	run db-update
+	echo "$output"
+	[ "$status" -ne 0 ]
+}
+
 @test "update same any package to same repository fails" {
 	releasePackage extra pkg-any-a
 	db-update
